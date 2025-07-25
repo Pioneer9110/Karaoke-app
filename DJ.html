@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="DJ-style.css">
+  <title>🎤 DJ Karaoke Panel</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+</head>
+<body>
+  <h1>🎤 DJ Karaoke Panel</h1>
+  <button onclick="startSession()">Start New Session</button>
+
+  <div id="sessionInfo" style="margin-top: 20px;"></div>
+  <canvas id="qrcode"></canvas>
+
+  <h2>📋 Song Requests</h2>
+  <ul id="songList"></ul>
+  <h2>🎶 Accepted Playlist</h2>
+  <ul id="acceptedList"></ul>
+
+  <script>
+    let currentSessionId = null;
+    let songRequests = [];
+
+    function generateSessionID() {
+      return Math.random().toString(36).substring(2, 8);
+    }
+
+    function startSession() {
+      currentSessionId = generateSessionID();
+      const joinURL = `http://localhost:3000/session/${currentSessionId}`;
+
+      document.getElementById("sessionInfo").innerHTML = `
+        <p>Session ID: <strong>${currentSessionId}</strong></p>
+        <p>Scan this QR to join:</p>
+        <p><em>${joinURL}</em></p>
+      `;
+
+      QRCode.toCanvas(document.getElementById('qrcode'), joinURL, function (error) {
+        if (error) console.error(error);
+        console.log('QR code generated!');
+      });
+
+      // Start polling for song requests
+      setInterval(() => {
+  fetchRequests();
+  fetchAcceptedSongs();
+}, 3000);
+    }
+
+  async function fetchRequests() {
+  if (!currentSessionId) return;
+
+  const res = await fetch(`http://localhost:3000/api/requests/${currentSessionId}`);
+  const songs = await res.json();
+
+  songRequests = songs;
+  renderRequests();
+}
+
+function renderRequests() {
+  const list = document.getElementById('songList');
+  list.innerHTML = '';
+
+  songRequests.forEach(song => {
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <strong>${song.title}</strong><br/>
+      <a href="${song.url}" target="_blank" style="color:#0af">▶️ Watch on YouTube</a><br/>
+      <button onclick='acceptSong(${JSON.stringify(JSON.stringify(song))})'>✅ Accept</button>
+      <button onclick='rejectSong(${JSON.stringify(JSON.stringify(song))})'>❌ Reject</button>
+    `;
+    list.appendChild(li);
+  });
+}
+
+async function acceptSong(songJson) {
+  const song = JSON.parse(songJson);
+  await fetch('http://localhost:3000/api/accept-song', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sessionId: currentSessionId, song }),
+  });
+
+  songRequests = songRequests.filter(s => s.url !== song.url);
+  renderRequests();
+}
+
+async function rejectSong(songJson) {
+  const song = JSON.parse(songJson);
+  await fetch('http://localhost:3000/api/reject-song', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sessionId: currentSessionId, song }),
+  });
+
+  songRequests = songRequests.filter(s => s.url !== url);
+  renderRequests();
+}
+
+async function fetchAcceptedSongs() {
+  if (!currentSessionId) return;
+
+  const res = await fetch(`http://localhost:3000/api/accepted/${currentSessionId}`);
+  const accepted = await res.json();
+
+  const list = document.getElementById("acceptedList");
+  list.innerHTML = "";
+
+  accepted.forEach((entry, index) => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <strong>${index + 1}. ${entry.title}</strong><br/>
+      <a href="${entry.url}" target="_blank" style="color:#0af">▶️ Karaoke Link</a>
+    `;
+    list.appendChild(li);
+  });
+}
+  </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "kareoke-app",
+  "version": "1.0.0",
+  "description": "Karaoke session web app with DJ and user roles",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

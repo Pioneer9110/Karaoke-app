@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="User-style.css">
+  <title>🎶 Join Karaoke Session</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+</head>
+<body>
+  <h1>🎤 Join Karaoke Session</h1>
+  <p id="sessionDisplay">Session: <strong>...</strong></p>
+
+  <label for="songInput">Enter a song you want to sing:</label>
+  <input type="text" id="songInput" placeholder="e.g. Adele - Hello (karaoke)">
+  <button onclick="submitSong()">Submit Song</button>
+
+  <h3>📨 Your Song Requests</h3>
+  <ul id="songList"></ul>
+
+  <h3>🎶 Playlist So Far</h3>
+  <ul id="acceptedSongsList"></ul>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    let sessionId = urlParams.get('session');
+    if (!sessionId) {
+      sessionId = prompt("Enter session ID:");
+    }
+
+    document.getElementById("sessionDisplay").innerHTML =
+      `Session: <strong>${sessionId}</strong>`;
+
+    const songList = [];
+
+    async function submitSong() {
+      const song = document.getElementById("songInput").value.trim();
+      if (!song) return;
+
+      const res = await fetch('http://localhost:3000/api/request-song', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId, song })
+      });
+
+      const data = await res.json();
+      console.log(data.message);
+
+      songList.push(song);
+      updateSongList();
+      document.getElementById("songInput").value = "";
+    }
+
+    function updateSongList() {
+      const ul = document.getElementById("songList");
+      ul.innerHTML = "";
+      songList.forEach((song, index) => {
+        const li = document.createElement("li");
+        li.textContent = `${index + 1}. ${song}`;
+        ul.appendChild(li);
+      });
+    }
+
+    async function fetchAcceptedSongs() {
+      const res = await fetch(`http://localhost:3000/api/accepted/${sessionId}`);
+      const songs = await res.json();
+
+      const list = document.getElementById('acceptedSongsList');
+      list.innerHTML = '';
+
+      songs.forEach((entry, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <strong>${index + 1}. ${entry.requestedName}</strong><br>
+          <a href="${entry.url}" target="_blank">▶️ Karaoke Link</a>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    fetchAcceptedSongs();
+    setInterval(fetchAcceptedSongs, 3000);
+  </script>
+</body>
+</html>
