@@ -6,42 +6,44 @@ A fun browser-based app where one person (the DJ) hosts a karaoke session, and o
 How to Run This Project
 -----------------------
 
-1. Requirements:
+### 1. Requirements:
    - Node.js must be installed.
    - A modern web browser (Chrome, Firefox, etc.)
 
-2. Installation:
-   a) Download or clone this repository.
-   b) Open a terminal and navigate to the project folder:
+### 2. Installation:
+   1. Download or clone this repository.
+   2. Open a terminal and navigate to the project folder:
       cd Karaoke-app
 
-3. Install Dependencies:
-   npm install
+### 3. Install Dependencies:
+   ```npm install```
 
-4. Start the Server:
-   npm start
+### 4. Start the Server:
+   ```npm start```
 
    The server will run at:
    http://localhost:3000
 
-5. Open your browser and visit:
+### 5. Open your browser and visit:
    http://localhost:3000
 
 -------------------
 Project Structure
 -------------------
 
+```bash
 Karaoke-app/
-├── Landingpage.html   <- Landing page
-├── DJ.html            <- DJ control panel (host)
-├── User.html          <- User request panel (joiner)
-├── Landingpage-style.css    <- Styles for landing page
-├── DJ-style.css       <- Styles for DJ panel
-├── User-style.css     <- Styles for User panel
-├── /server
-│   └── server.js      <- Node.js backend server
-├── package.json
-└── README.txt         <- This guide
+├── Landingpage.html        # Entry point where users choose to Host or Join a session
+├── DJ.html                 # 🎛DJ control panel for hosting and managing sessions
+├── User.html               # User panel to request songs and participate
+├── Landingpage-style.css   # Styles for Landingpage.html
+├── DJ-style.css            # Styles for DJ.html
+├── User-style.css          # Styles for User.html
+├── package.json            # Project metadata and dependencies
+├── README.md               # Project setup instructions and overview
+└── server/
+    └── server.js           # Node.js backend server (Express + API routes)
+```
 
 -----------------------------
 How the App Works (Overview)
@@ -76,7 +78,3 @@ Technology Stack
 - Node.js + Express (Backend)
 - YouTube Karaoke links (no API needed)
 - QR Code generator via CDN (qrcode.min.js)
-
---------------------------
-Created for fun & parties!
---------------------------
