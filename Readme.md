@@ -1,4 +1,4 @@
-Karaoke Party App
+# Karaoke Party App
 
 A fun browser-based app where one person (the DJ) hosts a karaoke session, and others join in by scanning a QR code or typing a session code. Users can request songs, and the DJ can accept or reject them in real-time.
 
