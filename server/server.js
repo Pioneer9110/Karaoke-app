@@ -106,6 +106,11 @@ app.get('/api/accepted/:sessionId', (req, res) => {
     res.json(accepted);
   });
 
+// Serve landing page at root
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../Login.html'));
+});
+
 app.listen(port, () => {
   console.log(`Karaoke server running at http://localhost:${port}`);
 });
