@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>DJ Auth — QueueUp</title>
+  <link rel="stylesheet" href="login-style.css" />
+</head>
+<body>
+  <div class="login-container">
+    <h1>🎤 QueueUp</h1>
+    <form id="auth-form">
+      <label for="email">Email</label>
+      <input type="email" id="email" required />
+
+      <label for="password">Password</label>
+      <input type="password" id="password" required />
+
+      <button type="submit">Login</button>
+      <p><a href="#" id="toggle">Don't have an account? Sign up</a></p>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById('auth-form');
+    const toggle = document.getElementById('toggle');
+    let isSignup = false;
+
+    toggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      isSignup = !isSignup;
+      form.querySelector('button').textContent = isSignup ? 'Sign Up' : 'Login';
+      toggle.textContent = isSignup ? 'Already have an account? Login' : "Don't have an account? Sign up";
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      const endpoint = isSignup ? '/api/signup' : '/api/login';
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.token) {
+        localStorage.setItem('token', data.token);
+        window.location.href = '/DJ.html';
+      } else {
+        alert(data.message || 'Error. Try again.');
+      }
+    });
+  </script>
+</body>
+</html>

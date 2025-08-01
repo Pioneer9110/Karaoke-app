@@ -2,10 +2,31 @@ const ytSearch = require('yt-search');
 const express = require('express');
 const cors = require('cors');
 const app = express();
+const path = require('path');
+const { router: authRouter, verifyToken } = require('./auth');
 const port = 3000;
 
 app.use(cors());
 app.use(express.json());
+app.use('/api', authRouter);
+app.use(express.static(path.join(__dirname, '..'))); // serve html/css/js
+
+app.get('/DJ.html', (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) return res.status(403).send('Access Denied');
+
+  const jwt = require('jsonwebtoken');
+  jwt.verify(token, 'super-secret-key', (err) => {
+    if (err) return res.status(403).send('Invalid Token');
+    next();
+  });
+}, (req, res) => {
+  res.sendFile(path.join(__dirname, '../DJ.html'));
+});
+
+app.get('/session/:id', (req, res) => {
+  res.sendFile(path.join(__dirname, '../User.html'));
+});
 
 const sessions = {}; // Store all requests here
 const acceptedSongs = {}; 
@@ -86,5 +107,5 @@ app.get('/api/accepted/:sessionId', (req, res) => {
   });
 
 app.listen(port, () => {
-  console.log(`🎵 Karaoke server running at http://localhost:${port}`);
+  console.log(`Karaoke server running at http://localhost:${port}`);
 });

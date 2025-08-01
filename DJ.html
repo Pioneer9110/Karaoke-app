@@ -16,6 +16,7 @@
   <ul id="songList"></ul>
   <h2>🎶 Accepted Playlist</h2>
   <ul id="acceptedList"></ul>
+  <button id="logout-btn" class="logout-btn">Logout</button>
 
   <script>
     let currentSessionId = null;
@@ -116,5 +117,20 @@ async function fetchAcceptedSongs() {
   });
 }
   </script>
+
+  <script>
+  //Protect page
+  if (!localStorage.getItem('token')) {
+    window.location.href = '/login.html';
+  }
+
+  //Logout button
+  document.getElementById('logout-btn').addEventListener('click', (e) => {
+    e.preventDefault();
+    localStorage.removeItem('token');
+    window.location.href = '/login.html';
+  });
+</script>
+
 </body>
 </html>
